@@ -1,0 +1,27 @@
+name: AI-Modernized JPetStore CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality-security-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+      - name: Static Analysis & Linting (Ruff)
+        run: ruff check app/ tests/
+      - name: Type Safety Verification (Mypy)
+        run: mypy app/
+      - name: Security SAST Scan (Bandit)
+        run: bandit -r app/ -ll
+      - name: Execute Functional & ACID Parity Test Suite
+        run: pytest -v
